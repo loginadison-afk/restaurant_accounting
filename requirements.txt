@@ -1,6 +1,9 @@
-flask
-flask-sqlalchemy
-flask-migrate
-flask-wtf
-pandas
-python-dotenv
+flask==2.3.3
+flask-sqlalchemy==3.1.1
+flask-migrate==4.0.7
+flask-wtf==1.2.1
+wtforms==3.1.2
+pandas==2.2.2
+sqlalchemy==2.0.30
+werkzeug==3.0.3
+python-dotenv==1.0.1
