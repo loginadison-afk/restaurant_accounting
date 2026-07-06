@@ -1,13 +1,17 @@
+import sys
+import os
+
+# ✅ เพิ่ม path สำหรับ Vercel
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from app import create_app, db
 from app.models import Menu, DailySale, Ingredient, Recipe
 
 app = create_app()
 
 with app.app_context():
-    db.drop_all()  # ⚠️ ลบตารางเก่า (เฉพาะตอนเปลี่ยนโมเดล)
     db.create_all()
-    print("✅ สร้างฐานข้อมูลใหม่เรียบร้อย!")
+    print("✅ สร้างฐานข้อมูลเรียบร้อย!")
 
 if __name__ == '__main__':
-    # ✅ แก้ให้คนอื่นใช้ได้
-    app.run(host='0.0.0.0', port=5000, debug=False)  # debug=False เพื่อความปลอดภัย
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
