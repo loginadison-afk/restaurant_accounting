@@ -1,3 +1,4 @@
+# Vercel Deploy 2026-07-07
 import sys
 import os
 
@@ -9,12 +10,10 @@ from app.models import Menu, DailySale, Ingredient, Recipe
 
 app = create_app()
 
-# สร้างตารางฐานข้อมูล
 with app.app_context():
     db.create_all()
     print("✅ สร้างฐานข้อมูลเรียบร้อย!")
 
-# ✅ เพิ่ม handler สำหรับ Vercel
 def handler(request):
     return app(request)
 
