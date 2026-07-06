@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>{% block title %}ร้านอาหารของฉัน{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Sarabun', sans-serif;
+            padding-bottom: 70px;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            min-height: 80px;
+        }
+        .stat-card h3 { font-size: 1.5rem; font-weight: bold; margin: 0; }
+        .stat-card h6 { font-size: 0.7rem; opacity: 0.9; margin-bottom: 3px; }
+        .stat-card.income { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .stat-card.profit { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .stat-card.loss { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; }
+        .btn-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border: none; }
+        .btn-danger { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none; }
+        .badge-delivery { background-color: #ff6b6b; color: white; padding: 3px 12px; border-radius: 20px; font-size: 0.75rem; }
+        .badge-instore { background-color: #4ecdc4; color: white; padding: 3px 12px; border-radius: 20px; font-size: 0.75rem; }
+        .table th { background-color: #667eea; color: white; font-size: 0.8rem; }
+        .table td { font-size: 0.85rem; vertical-align: middle; }
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .form-control, .form-select { font-size: 16px; }
+        .flash-message { animation: fadeIn 0.5s; font-size: 0.9rem; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 576px) {
+            .hide-mobile { display: none; }
+            .stat-card { padding: 10px; min-height: 65px; }
+            .stat-card h3 { font-size: 1.2rem; }
+            .stat-card h6 { font-size: 0.6rem; }
+            .table th, .table td { font-size: 0.7rem; padding: 6px 4px; }
+            .btn-sm { font-size: 0.7rem; padding: 4px 8px; }
+            .navbar-brand { font-size: 1rem; }
+        }
+        @media (max-width: 768px) {
+            .container { padding-left: 10px; padding-right: 10px; }
+            h1 { font-size: 1.5rem; }
+            h5 { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('report.dashboard') }}">
+                <i class="fas fa-utensils"></i> <span class="d-none d-sm-inline">ร้านอาหาร</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('report.dashboard') }}">
+                            <i class="fas fa-chart-pie"></i> <span class="d-none d-md-inline">Dashboard</span>
+                        </a>
+                    </li>
+                    <!-- ✅ เพิ่มเมนูรายงาน -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-chart-bar"></i> <span class="d-none d-md-inline">รายงาน</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('report.weekly_report') }}"><i class="fas fa-calendar-week"></i> รายสัปดาห์</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('report.monthly_report') }}"><i class="fas fa-calendar-alt"></i> รายเดือน</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('report.custom_report') }}"><i class="fas fa-sliders-h"></i> เลือกเอง</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="menuDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-list"></i> <span class="d-none d-md-inline">จัดการ</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('menu.list_menu') }}"><i class="fas fa-utensils"></i> เมนูอาหาร</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('menu.add_menu') }}"><i class="fas fa-plus-circle"></i> เพิ่มเมนู</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('ingredient.list_ingredients') }}"><i class="fas fa-carrot"></i> วัตถุดิบ</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('ingredient.add_ingredient') }}"><i class="fas fa-plus-circle"></i> เพิ่มวัตถุดิบ</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="saleDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-cash-register"></i> <span class="d-none d-md-inline">ยอดขาย</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('sale.list_sales') }}"><i class="fas fa-list"></i> รายการยอดขาย</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('sale.add_sale') }}"><i class="fas fa-plus-circle"></i> บันทึกยอดขาย</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-3 mt-md-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show flash-message" role="alert">
+                        <i class="fas fa-info-circle"></i> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="bg-dark text-white text-center py-2 mt-4 fixed-bottom d-block d-md-none">
+        <div class="container"><small><i class="fas fa-utensils"></i> ร้านอาหารของฉัน</small></div>
+    </footer>
+    <footer class="bg-dark text-white text-center py-3 mt-5 d-none d-md-block">
+        <div class="container"><small>© 2026 ร้านอาหารของฉัน - จัดการบัญชีรายรับรายจ่าย</small></div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

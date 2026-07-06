@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}เลือกรายงาน{% endblock %}
+
+{% block content %}
+<h1 class="mb-3"><i class="fas fa-sliders-h"></i> เลือกช่วงเวลารายงาน</h1>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST">
+            <div class="row">
+                <div class="col-12 col-md-5">
+                    <label class="form-label">วันที่เริ่มต้น</label>
+                    <input type="date" name="start_date" class="form-control" 
+                           value="{{ start_date.strftime('%Y-%m-%d') if start_date else '' }}" required>
+                </div>
+                <div class="col-12 col-md-5">
+                    <label class="form-label">วันที่สิ้นสุด</label>
+                    <input type="date" name="end_date" class="form-control" 
+                           value="{{ end_date.strftime('%Y-%m-%d') if end_date else '' }}" required>
+                </div>
+                <div class="col-12 col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> ดูรายงาน
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if revenue is defined %}
+<div class="card mt-3">
+    <div class="card-body">
+        <p><strong>ระยะเวลา:</strong> {{ start_date.strftime('%d/%m/%Y') }} - {{ end_date.strftime('%d/%m/%Y') }}</p>
+        <hr>
+        <div class="row">
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-2">
+                    <h6>รายได้</h6>
+                    <h4>{{ "%.0f"|format(revenue) }} บาท</h4>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-2 income">
+                    <h6>ต้นทุน</h6>
+                    <h4>{{ "%.0f"|format(cost) }} บาท</h4>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-2 profit">
+                    <h6>กำไร</h6>
+                    <h4 class="{% if profit >= 0 %}text-white{% else %}text-danger{% endif %}">
+                        {{ "%.0f"|format(profit) }} บาท
+                    </h4>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-2 loss">
+                    <h6>รายการขาย</h6>
+                    <h4>{{ total_sales }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="mt-3">
+    <a href="{{ url_for('report.dashboard') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> กลับ Dashboard
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}รายการเมนู{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <h1 class="mb-2 mb-md-0"><i class="fas fa-list"></i> รายการเมนู</h1>
+    <a href="{{ url_for('menu.add_menu') }}" class="btn btn-success btn-sm">
+        <i class="fas fa-plus"></i> เพิ่มเมนู
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-2 p-md-3">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>ชื่อเมนู</th>
+                        <th>ประเภท</th>
+                        <th>ราคาขาย</th>
+                        <th>ต้นทุน/จาน</th>
+                        <th>กำไร/จาน</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for menu in menus %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><strong>{{ menu.name }}</strong></td>
+                        <td>
+                            {% if menu.category == 'delivery' %}
+                                <span class="badge-delivery"><i class="fas fa-motorcycle"></i> ส่ง</span>
+                            {% else %}
+                                <span class="badge-instore"><i class="fas fa-store"></i> หน้าร้าน</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ "%.2f"|format(menu.price) }} บาท</td>
+                        <td>
+                            {% if menu.recipes|length > 0 %}
+                                {{ "%.2f"|format(menu.cost_per_dish) }} บาท
+                            {% else %}
+                                <span class="text-warning">ยังไม่กำหนด</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="{% if menu.profit_per_dish >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ "%.2f"|format(menu.profit_per_dish) }} บาท
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                <a href="{{ url_for('ingredient.manage_recipe', menu_id=menu.id) }}" class="btn btn-info btn-sm" title="กำหนดสูตร">
+                                    <i class="fas fa-book"></i>
+                                </a>
+                                <a href="{{ url_for('menu.edit_menu', id=menu.id) }}" class="btn btn-primary btn-sm" title="แก้ไข">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button onclick="confirmDelete({{ menu.id }}, '{{ menu.name }}')" class="btn btn-danger btn-sm" title="ลบ">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">ยังไม่มีเมนูในระบบ</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal ยืนยันการลบ -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">ยืนยันการลบ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                คุณต้องการลบเมนู <strong id="deleteMenuName"></strong> ใช่หรือไม่?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">ยกเลิก</button>
+                <form id="deleteForm" method="POST">
+                    <button type="submit" class="btn btn-danger btn-sm">ยืนยัน</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete(id, name) {
+    document.getElementById('deleteMenuName').textContent = name;
+    document.getElementById('deleteForm').action = "{{ url_for('menu.delete_menu', id=0) }}".replace('0', id);
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}  

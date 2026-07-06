@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}เพิ่มเมนู{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-plus-circle"></i> เพิ่มเมนูใหม่</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">หลังจากเพิ่มเมนูแล้ว ระบบจะพาไปกำหนดสูตรอาหาร (วัตถุดิบที่ใช้)</p>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">ชื่อเมนู</label>
+                        <input type="text" name="name" class="form-control" required placeholder="เช่น ผัดไทย">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">ราคาขาย (บาท)</label>
+                        <input type="number" name="price" class="form-control" step="0.01" required placeholder="เช่น 80">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">ประเภท</label>
+                        <select name="category" class="form-select" required>
+                            <option value="">เลือกประเภท</option>
+                            <option value="delivery">อาหารส่ง (คีโต)</option>
+                            <option value="instore">อาหารหน้าร้าน (ทั่วไป)</option>
+                        </select>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> บันทึกเมนู
+                        </button>
+                    </div>
+                </form>
+                <div class="mt-3 text-center">
+                    <a href="{{ url_for('menu.list_menu') }}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-arrow-left"></i> กลับ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

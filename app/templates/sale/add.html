@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}บันทึกยอดขาย{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="fas fa-cash-register"></i> บันทึกยอดขายประจำวัน</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">เลือกเมนู</label>
+                        <select name="menu_id" class="form-select" required>
+                            <option value="">-- เลือกเมนู --</option>
+                            {% for menu in menus %}
+                            <option value="{{ menu.id }}">
+                                {{ menu.name }} 
+                                ({% if menu.category == 'delivery' %}ส่ง{% else %}หน้าร้าน{% endif %})
+                                - {{ "%.2f"|format(menu.price) }} บาท
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">จำนวนที่ขายได้ (จาน)</label>
+                        <input type="number" name="quantity" class="form-control" min="1" required placeholder="เช่น 10">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">วันที่</label>
+                        <input type="date" name="sale_date" class="form-control" value="{{ today }}">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> บันทึกยอดขาย
+                        </button>
+                    </div>
+                </form>
+                <div class="mt-3 text-center">
+                    <a href="{{ url_for('sale.list_sales') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> กลับ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}รายการวัตถุดิบ{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <h1 class="mb-2 mb-md-0"><i class="fas fa-carrot"></i> วัตถุดิบ</h1>
+    <a href="{{ url_for('ingredient.add_ingredient') }}" class="btn btn-success btn-sm">
+        <i class="fas fa-plus"></i> เพิ่มวัตถุดิบ
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-2 p-md-3">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>ชื่อ</th>
+                        <th class="hide-mobile">ราคาต่อชุด</th>
+                        <th class="hide-mobile">ปริมาณ</th>
+                        <th>ราคาต่อกรัม</th>  <!-- ✅ เปลี่ยนจาก "ราคาต่อหน่วย" -->
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in ingredients %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><strong>{{ item.name }}</strong></td>
+                        <td class="hide-mobile">{{ "%.2f"|format(item.total_cost) }} บาท</td>
+                        <td class="hide-mobile">{{ item.total_quantity }} {{ item.unit }}</td>
+                        <td>{{ "%.2f"|format(item.cost_per_gram) }} บาท/กรัม</td>  <!-- ✅ เปลี่ยน -->
+                        <td>
+                            <a href="{{ url_for('ingredient.edit_ingredient', id=item.id) }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button onclick="confirmDelete({{ item.id }}, '{{ item.name }}')" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">ยังไม่มีวัตถุดิบ</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal ยืนยันการลบ -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">ยืนยันการลบ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                คุณต้องการลบวัตถุดิบ <strong id="deleteName"></strong> ใช่หรือไม่?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">ยกเลิก</button>
+                <form id="deleteForm" method="POST">
+                    <button type="submit" class="btn btn-danger btn-sm">ยืนยัน</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete(id, name) {
+    document.getElementById('deleteName').textContent = name;
+    document.getElementById('deleteForm').action = "{{ url_for('ingredient.delete_ingredient', id=0) }}".replace('0', id);
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}

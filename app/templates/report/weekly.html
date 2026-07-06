@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}รายงานรายสัปดาห์{% endblock %}
+
+{% block content %}
+<h1 class="mb-3"><i class="fas fa-calendar-week"></i> รายงานรายสัปดาห์</h1>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <p><strong>ระยะเวลา:</strong> {{ start_date.strftime('%d/%m/%Y') }} - {{ end_date.strftime('%d/%m/%Y') }}</p>
+        <hr>
+        <div class="row">
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-2">
+                    <h6>รายได้</h6>
+                    <h4>{{ "%.0f"|format(revenue) }} บาท</h4>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-2 income">
+                    <h6>ต้นทุน</h6>
+                    <h4>{{ "%.0f"|format(cost) }} บาท</h4>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-2 profit">
+                    <h6>กำไร</h6>
+                    <h4 class="{% if profit >= 0 %}text-white{% else %}text-danger{% endif %}">
+                        {{ "%.0f"|format(profit) }} บาท
+                    </h4>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-2 loss">
+                    <h6>รายการขาย</h6>
+                    <h4>{{ total_sales }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5><i class="fas fa-motorcycle"></i> อาหารส่ง</h5>
+                <p>รายได้: {{ "%.0f"|format(delivery_revenue) }} บาท</p>
+                <p>ต้นทุน: {{ "%.0f"|format(delivery_cost) }} บาท</p>
+                <p class="fw-bold {% if delivery_profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    กำไร: {{ "%.0f"|format(delivery_profit) }} บาท
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5><i class="fas fa-store"></i> อาหารหน้าร้าน</h5>
+                <p>รายได้: {{ "%.0f"|format(instore_revenue) }} บาท</p>
+                <p>ต้นทุน: {{ "%.0f"|format(instore_cost) }} บาท</p>
+                <p class="fw-bold {% if instore_profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    กำไร: {{ "%.0f"|format(instore_profit) }} บาท
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{{ url_for('report.dashboard') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> กลับ Dashboard
+    </a>
+</div>
+{% endblock %}

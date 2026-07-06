@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - ร้านอาหารของฉัน{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-3 mb-md-4"><i class="fas fa-chart-pie"></i> ภาพรวมร้านอาหาร</h1>
+    </div>
+</div>
+
+<!-- การ์ดสรุป -->
+<div class="row mb-3 mb-md-4 g-2 g-md-3">
+    <div class="col-6 col-md-3">
+        <div class="stat-card p-2 p-md-3">
+            <h6><i class="fas fa-utensils"></i> เมนู</h6>
+            <h3 class="fs-4 fs-md-3">{{ total_menus }}</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card p-2 p-md-3 income">
+            <h6><i class="fas fa-coins"></i> รายได้</h6>
+            <h3 class="fs-4 fs-md-3">{{ "%.0f"|format(total_revenue) }}</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card p-2 p-md-3 profit">
+            <h6><i class="fas fa-hand-holding-usd"></i> กำไร</h6>
+            <h3 class="fs-4 fs-md-3">{{ "%.0f"|format(total_profit) }}</h3>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card p-2 p-md-3 loss">
+            <h6><i class="fas fa-file-invoice"></i> ขาย</h6>
+            <h3 class="fs-4 fs-md-3">{{ total_sales }}</h3>
+        </div>
+    </div>
+</div>
+
+<!-- ส่วนนำเสนอ -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-success">
+            <i class="fas fa-bullseye"></i> 
+            <strong>อัตรากำไรสุทธิ:</strong> {{ "%.1f"|format(profit_margin) }}%
+            {% if profit_margin > 30 %}
+                <span class="badge bg-success ms-2">ดีมาก! 🎉</span>
+            {% elif profit_margin > 15 %}
+                <span class="badge bg-info ms-2">กำลังดี 👍</span>
+            {% else %}
+                <span class="badge bg-warning ms-2">ควรปรับปรุง 📈</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- เปรียบเทียบช่องทาง -->
+<div class="row mb-4 g-3">
+    <div class="col-12 col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-motorcycle"></i> อาหารส่ง (คีโต)</h5>
+                <hr>
+                <div class="row">
+                    <div class="col-6">
+                        <small>รายได้</small>
+                        <p class="fw-bold">{{ "%.0f"|format(delivery_revenue) }} บาท</p>
+                    </div>
+                    <div class="col-6">
+                        <small>ต้นทุน</small>
+                        <p class="fw-bold">{{ "%.0f"|format(delivery_cost) }} บาท</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <small>กำไร</small>
+                        <p class="fw-bold {% if delivery_profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {{ "%.0f"|format(delivery_profit) }} บาท
+                        </p>
+                    </div>
+                    <div class="col-6">
+                        <small>อัตรากำไร</small>
+                        <p class="fw-bold {% if delivery_margin >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {{ "%.1f"|format(delivery_margin) }}%
+                        </p>
+                    </div>
+                </div>
+                {% if delivery_profit < 0 %}
+                    <div class="alert alert-danger mt-2 p-2">
+                        <i class="fas fa-exclamation-triangle"></i> อาหารส่งกำลังขาดทุน!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-store"></i> หน้าร้าน (ทั่วไป)</h5>
+                <hr>
+                <div class="row">
+                    <div class="col-6">
+                        <small>รายได้</small>
+                        <p class="fw-bold">{{ "%.0f"|format(instore_revenue) }} บาท</p>
+                    </div>
+                    <div class="col-6">
+                        <small>ต้นทุน</small>
+                        <p class="fw-bold">{{ "%.0f"|format(instore_cost) }} บาท</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <small>กำไร</small>
+                        <p class="fw-bold {% if instore_profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {{ "%.0f"|format(instore_profit) }} บาท
+                        </p>
+                    </div>
+                    <div class="col-6">
+                        <small>อัตรากำไร</small>
+                        <p class="fw-bold {% if instore_margin >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {{ "%.1f"|format(instore_margin) }}%
+                        </p>
+                    </div>
+                </div>
+                {% if instore_profit < 0 %}
+                    <div class="alert alert-danger mt-2 p-2">
+                        <i class="fas fa-exclamation-triangle"></i> อาหารหน้าร้านกำลังขาดทุน!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- สรุปเมนูดีที่สุด/แย่ที่สุด -->
+<div class="row mb-4 g-3">
+    {% if best_menu %}
+    <div class="col-12 col-md-6">
+        <div class="card border-success h-100">
+            <div class="card-body">
+                <h5 class="card-title text-success"><i class="fas fa-trophy"></i> เมนูทำเงินสูงสุด</h5>
+                <p class="h4">{{ best_menu.name }}</p>
+                <p class="text-muted">ประเภท: {{ best_menu.category }}</p>
+                <p class="fw-bold text-success">กำไร {{ "%.0f"|format(best_menu.profit) }} บาท</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if worst_menu %}
+    <div class="col-12 col-md-6">
+        <div class="card border-danger h-100">
+            <div class="card-body">
+                <h5 class="card-title text-danger"><i class="fas fa-exclamation-triangle"></i> เมนูขาดทุนสูงสุด</h5>
+                <p class="h4">{{ worst_menu.name }}</p>
+                <p class="text-muted">ประเภท: {{ worst_menu.category }}</p>
+                <p class="fw-bold text-danger">ขาดทุน {{ "%.0f"|format(worst_menu.profit|abs) }} บาท</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- กราฟ -->
+<div class="row g-3">
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">เปรียบเทียบรายได้-ต้นทุน-กำไร</h5>
+                <div style="height: 250px;">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">สัดส่วนรายได้ต่อช่องทาง</h5>
+                <div style="height: 250px;">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// กราฟเปรียบเทียบ
+const ctx1 = document.getElementById('comparisonChart').getContext('2d');
+new Chart(ctx1, {
+    type: 'bar',
+    data: {
+        labels: ['อาหารส่ง', 'อาหารหน้าร้าน'],
+        datasets: [
+            {
+                label: 'รายได้',
+                data: [{{ delivery_revenue }}, {{ instore_revenue }}],
+                backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                borderColor: '#667eea',
+                borderWidth: 2
+            },
+            {
+                label: 'ต้นทุน',
+                data: [{{ delivery_cost }}, {{ instore_cost }}],
+                backgroundColor: 'rgba(245, 87, 108, 0.6)',
+                borderColor: '#f5576c',
+                borderWidth: 2
+            },
+            {
+                label: 'กำไร',
+                data: [{{ delivery_profit }}, {{ instore_profit }}],
+                backgroundColor: 'rgba(56, 239, 125, 0.6)',
+                borderColor: '#38ef7d',
+                borderWidth: 2
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: { font: { size: 10 } }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { font: { size: 10 } }
+            },
+            x: {
+                ticks: { font: { size: 10 } }
+            }
+        }
+    }
+});
+
+// กราฟวงกลมสัดส่วนรายได้
+const ctx2 = document.getElementById('categoryChart').getContext('2d');
+new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+        labels: ['อาหารส่ง', 'อาหารหน้าร้าน'],
+        datasets: [{
+            data: [{{ delivery_revenue }}, {{ instore_revenue }}],
+            backgroundColor: ['#ff6b6b', '#4ecdc4'],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: { font: { size: 10 } }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

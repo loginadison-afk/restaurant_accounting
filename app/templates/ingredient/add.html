@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}เพิ่มวัตถุดิบ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-plus-circle"></i> เพิ่มวัตถุดิบ</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">ชื่อวัตถุดิบ</label>
+                        <input type="text" name="name" class="form-control" required placeholder="เช่น หมู, ผัก, เครื่องปรุง">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">ราคาทั้งชุด (บาท)</label>
+                        <input type="number" name="total_cost" class="form-control" step="0.01" required placeholder="เช่น 200">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">ปริมาณทั้งหมด</label>
+                        <input type="number" name="total_quantity" class="form-control" step="0.01" required placeholder="เช่น 1000">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">หน่วย</label>
+                        <select name="unit" class="form-select">
+                            <option value="กรัม">กรัม</option>
+                            <option value="กิโลกรัม">กิโลกรัม</option>
+                            <option value="ลิตร">ลิตร</option>
+                            <option value="ชิ้น">ชิ้น</option>
+                            <option value="ขีด">ขีด</option>
+                        </select>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> บันทึกวัตถุดิบ
+                        </button>
+                    </div>
+                </form>
+                <div class="mt-3 text-center">
+                    <a href="{{ url_for('ingredient.list_ingredients') }}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-arrow-left"></i> กลับ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

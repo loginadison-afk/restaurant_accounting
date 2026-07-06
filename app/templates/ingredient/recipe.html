@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}กำหนดสูตรอาหาร - {{ menu.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0"><i class="fas fa-book"></i> กำหนดสูตรอาหาร: {{ menu.name }}</h4>
+            </div>
+            <div class="card-body">
+                <!-- คำอธิบาย -->
+                <div class="alert alert-info">
+                    <i class="fas fa-lightbulb"></i>
+                    <strong>วิธีใช้:</strong> 
+                    บอกว่าอาหารจานนี้ <strong>ใช้วัตถุดิบกี่กรัมต่อ 1 จาน</strong>
+                    <br>
+                    <small class="text-muted">เช่น ผัดไทย ใช้หมู 150 กรัม → กรอก 150</small>
+                </div>
+                
+                <!-- แสดงต้นทุน -->
+                {% if menu.recipes|length > 0 %}
+                <div class="alert alert-success">
+                    <strong>✅ ต้นทุนต่อจาน:</strong> {{ "%.2f"|format(menu.cost_per_dish) }} บาท
+                    <br>
+                    <strong>💰 กำไรต่อจาน:</strong> {{ "%.2f"|format(menu.profit_per_dish) }} บาท
+                    <br>
+                    <small class="text-muted">(ราคาขาย {{ "%.2f"|format(menu.price) }} - ต้นทุน {{ "%.2f"|format(menu.cost_per_dish) }})</small>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    <strong>ยังไม่ได้กำหนดสูตรอาหาร</strong>
+                    <br>กรุณากรอกข้อมูลด้านล่าง
+                </div>
+                {% endif %}
+
+                <form method="POST">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width:40%;">วัตถุดิบ</th>
+                                    <th style="width:40%;">
+                                        ใช้กี่กรัมต่อ 1 จาน
+                                        <small class="text-muted d-block">(เฉพาะตัวเลข)</small>
+                                    </th>
+                                    <th style="width:20%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="recipeRows">
+                                {% if recipes %}
+                                    {% for recipe in recipes %}
+                                    <tr>
+                                        <td>
+                                            <select name="ingredient_id" class="form-select form-select-sm">
+                                                <option value="">เลือกวัตถุดิบ</option>
+                                                {% for ing in ingredients %}
+                                                <option value="{{ ing.id }}" {% if recipe.ingredient_id == ing.id %}selected{% endif %}>
+                                                    {{ ing.name }} ({{ "%.2f"|format(ing.total_cost) }} บาท / {{ ing.total_quantity }} {{ ing.unit }})
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="number" name="grams_per_dish" class="form-control form-control-sm" 
+                                                       step="0.01" value="{{ recipe.grams_per_dish }}" placeholder="เช่น 150" required>
+                                                <span class="input-group-text">กรัม</span>
+                                            </div>
+                                            <small class="text-muted">* กรัมต่อ 1 จาน</small>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <!-- แถวแรก -->
+                                    <tr>
+                                        <td>
+                                            <select name="ingredient_id" class="form-select form-select-sm">
+                                                <option value="">เลือกวัตถุดิบ</option>
+                                                {% for ing in ingredients %}
+                                                <option value="{{ ing.id }}">
+                                                    {{ ing.name }} ({{ "%.2f"|format(ing.total_cost) }} บาท / {{ ing.total_quantity }} {{ ing.unit }})
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="number" name="grams_per_dish" class="form-control form-control-sm" 
+                                                       step="0.01" placeholder="เช่น 150" required>
+                                                <span class="input-group-text">กรัม</span>
+                                            </div>
+                                            <small class="text-muted">* กรัมต่อ 1 จาน</small>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-success btn-sm" onclick="addRow(this)">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> บันทึกสูตรอาหาร
+                        </button>
+                        <a href="{{ url_for('menu.list_menu') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> กลับ
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function addRow(btn) {
+    const row = btn.closest('tr');
+    const tbody = row.parentNode;
+    
+    const newRow = row.cloneNode(true);
+    newRow.querySelector('select').value = '';
+    newRow.querySelector('input').value = '';
+    
+    const newBtn = newRow.querySelector('.btn-success');
+    if (newBtn) {
+        newBtn.className = 'btn btn-danger btn-sm';
+        newBtn.innerHTML = '<i class="fas fa-times"></i>';
+        newBtn.onclick = function() { removeRow(this); };
+    }
+    
+    tbody.appendChild(newRow);
+}
+
+function removeRow(btn) {
+    const row = btn.closest('tr');
+    const tbody = row.parentNode;
+    if (tbody.children.length > 1) {
+        row.remove();
+    } else {
+        alert('ต้องมีอย่างน้อย 1 แถว');
+    }
+}
+</script>
+{% endblock %}

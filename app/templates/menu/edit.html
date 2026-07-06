@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}แก้ไขเมนู{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0"><i class="fas fa-edit"></i> แก้ไขเมนู</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">ชื่อเมนู</label>
+                        <input type="text" name="name" class="form-control" value="{{ menu.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">ราคาขาย (บาท)</label>
+                        <input type="number" name="price" class="form-control" step="0.01" value="{{ menu.price }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">ต้นทุนวัตถุดิบต่อจาน (บาท)</label>
+                        <input type="number" name="cost" class="form-control" step="0.01" value="{{ menu.cost }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">ประเภท</label>
+                        <select name="category" class="form-select" required>
+                            <option value="delivery" {% if menu.category == 'delivery' %}selected{% endif %}>อาหารส่ง (คีโต)</option>
+                            <option value="instore" {% if menu.category == 'instore' %}selected{% endif %}>อาหารหน้าร้าน (ทั่วไป)</option>
+                        </select>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save"></i> อัปเดตเมนู
+                        </button>
+                    </div>
+                </form>
+                <div class="mt-3 text-center">
+                    <a href="{{ url_for('menu.list_menu') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> กลับ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
